@@ -1,8 +1,8 @@
 # 立收通（LSPay）对接 Skill
 
-让 AI 编程助手（Cursor、Claude Code 等支持 Agent Skills 的工具）按立收通协议完成支付对接：签名、统一下单、分账、快捷支付、电子账户、异步通知和上线检查。
+让 AI 编程助手（Cursor、Claude Code 等支持 Agent Skills 的工具）按立收通协议完成支付对接：签名、统一下单、分账、快捷支付、电子账户、异步通知和上线检查。本 skill 只依赖协议文档，不依赖任何 SDK。
 
-配套 SDK：<https://github.com/yongweiq885-ctrl/lspay-SDK>
+需要现成的多语言 SDK，见 <https://github.com/yongweiq885-ctrl/lspay-SDK>。
 
 ## 安装
 
@@ -39,7 +39,6 @@ git clone https://github.com/yongweiq885-ctrl/lspay-skill.git "$env:USERPROFILE\
 | [account.md](account.md) | 电子账户开户、业务开通/变更、余额、提现、结算 |
 | [quickpay.md](quickpay.md) | 银行卡快捷支付 |
 | [signing.md](signing.md) | 签名规则、测试数据、各语言最小客户端 |
-| [sdk.md](sdk.md) | 官方 SDK 获取方式与用法、PHP 调试面板 |
 | [test-account.md](test-account.md) | 商户配置初始化 |
 | `scripts/lspay_sign.py` | 签名 / 验签调试工具（Python 3.7+，无第三方依赖） |
 

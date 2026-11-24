@@ -42,6 +42,11 @@
 `POST https://api.lspay.tech/{path}`，`Content-Type: application/x-www-form-urlencoded;charset=utf-8`，响应为 JSON。
 网络超时建议连接 10 秒、读取 30 秒。
 
+下面是最小骨架，接进项目时在发送前补两条校验：
+
+- 统一下单 `gateway/unifiedorder` 的 `channel_extra` 为空就拒绝发送。
+- `channel_extra.pay_data_type == "cashier"` 时不发送，改为只注入公共参数并签名，输出自动提交的表单，见 [payment.md](payment.md) 的「cashier 收银台」。所以把“注入公共参数 + 签名”单独做成一个函数，发送和生成表单都调用它。
+
 ### PHP (7.4+)
 
 ```php

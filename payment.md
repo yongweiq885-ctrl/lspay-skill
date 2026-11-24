@@ -17,7 +17,7 @@
 | `notify_url` | 否 | String(128) | 异步通知地址。**不传就不会回调** |
 | `return_url` | 否 | String(128) | 支付后同步跳转地址 |
 | `expired_time` | 否 | int | 订单有效期（秒），默认 7200 |
-| `channel_extra` | 是 | String(256) | JSON 字符串，见下。官方 SDK 不传时直接报 `channel_extra 必填` |
+| `channel_extra` | 是 | String(256) | JSON 字符串，见下。客户端封装里校验必填，不传就拒绝发送 |
 | `division_mode` | 否 | int | `0` 不分账（默认）、`1` 实时分账、`2` 延时分账。见 [division.md](division.md) |
 | `ext_param` | 否 | String(512) | 商户自定义，回调原样返回 |
 | `polling_mode` | 否 | int | 通道轮询：`0` 关闭（默认）、`1` 自然轮询、`2` 权重轮询、`3` 防断链轮询 |
@@ -100,9 +100,7 @@ channel_extra={"pay_data_type":"code_img_url"}
 
 前后端分离时，后端只返回 `action` 和已签名字段，前端拿到后立即创建同样的隐藏表单并 `submit()`，同样不需要用户再点一次。
 
-官方 SDK 已封装，见 [sdk.md](sdk.md) 的「cashier 收银台表单」；普通接口调用发 cashier 会直接报错。自建客户端时，把“签名”和“发送”拆成两个函数，表单与接口调用共用同一个签名函数。
-
-SDK 调试面板里需要再点一次“提交跳转收银台”，只是为了防止调试时误下单，正式接入不要照抄这个交互。
+客户端封装里把“签名”和“发送”拆成两个函数，表单与接口调用共用同一个签名函数；发送函数遇到 `pay_data_type=cashier` 直接拒绝，提示改用表单，避免拿到 HTML 后报 JSON 解析错误。
 
 签名后的字段里含 `sign`，但不含 `md5_key`，可以交给浏览器。不要把 `md5_key` 输出到页面。
 

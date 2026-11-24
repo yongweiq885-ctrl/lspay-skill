@@ -41,7 +41,7 @@ description: 对接立收通（LSPay，api.lspay.tech）。用户提到立收通
 ```text
 - [ ] 1. 初始化商户配置
 - [ ] 2. 收集对接信息
-- [ ] 3. 选择实现方式（官方 SDK 或自建客户端）
+- [ ] 3. 实现客户端封装（签名 + 公共参数 + POST）
 - [ ] 4. 实现签名并通过测试数据
 - [ ] 5. 实现业务接口
 - [ ] 6. 实现异步通知
@@ -57,7 +57,7 @@ description: 对接立收通（LSPay，api.lspay.tech）。用户提到立收通
 - 是否分账：不分账、实时分账、延时分账、余额支付。分账接收方要先开电子账户。
 - 公网可访问的 `notify_url`。
 
-**3. 选择实现方式**。优先用官方 SDK（[GitHub 仓库](https://github.com/yongweiq885-ctrl/lspay-SDK)，PHP / Java / Python / Go / C# / UniApp），见 [sdk.md](sdk.md)。项目不方便引入 SDK 时，按 [signing.md](signing.md) 的最小客户端写一个封装类（签名 + 公共参数 + POST），业务代码只调用这个类。
+**3. 实现客户端封装**。按 [signing.md](signing.md) 的最小客户端写一个封装类（签名 + 公共参数 + POST），业务代码只调用这个类。签名和发送拆成两个函数，cashier 表单与接口调用共用同一个签名函数。
 
 **4. 签名自测**。新写的签名函数必须通过 [signing.md](signing.md) 里的三组测试数据。调试工具：
 
@@ -185,6 +185,5 @@ python scripts/lspay_sign.py verify --key "$LSPAY_MD5_KEY" --form "<通知原文
 - [division.md](division.md)：实时/延时分账、交易确认、确认退款、可转余额、订单转账及通知、余额支付
 - [account.md](account.md)：电子账户开户、业务开通/变更、用户查询、余额查询、提现、结算查询
 - [quickpay.md](quickpay.md)：快捷支付绑卡、支付申请、短信校验、支付确认、解绑
-- [sdk.md](sdk.md)：官方 lspay-sdk（PHP / Java / Python / C# / JS / Go）获取方式、用法、cashier 收银台表单、PHP 调试面板
 - [test-account.md](test-account.md)：安装后初始化配置，并引导用户获取商户号、应用 ID 和密钥
 - `scripts/lspay_sign.py`：签名与验签调试工具（Python 3.7+，无第三方依赖）

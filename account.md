@@ -46,13 +46,13 @@
 `legal_name`、`legal_cert_type`（默认 `00` 身份证）、`legal_cert_no`、`legal_cert_validity_type`、`legal_cert_begin_date`、
 `legal_cert_end_date`（非长期必填）、`contact_name`、`contact_mobile`，除标注外均必填。
 
-开户、业务开通、业务变更的 `channel_extra` 可以超过 256 字符，官方 SDK 放宽到 2048。
+开户、业务开通、业务变更的 `channel_extra` 可以超过 256 字符，客户端的长度校验按 2048 放宽。
 
 响应：`trans_status`、`account_no`（用户编号，保存下来）、`resp_desc`。开户成功是 `trans_status == "S"`。
 
 ## 业务开通 `gateway/user/personconfirm`
 
-请求固定 `way_code=APPLY`（SDK 自动带上）。开通成功是 `trans_status == "S"`。
+请求固定 `way_code=APPLY`。开通成功是 `trans_status == "S"`。
 
 | 参数 | 必填 | 说明 |
 | --- | --- | --- |
@@ -85,15 +85,15 @@
 
 ## 业务变更 `gateway/user/personmodify`
 
-请求固定 `way_code=APPLY`（SDK 自动带上）。变更成功是 `trans_status == "S"`。
+请求固定 `way_code=APPLY`。变更成功是 `trans_status == "S"`。
 参数同业务开通，但 `card_info` 只有 `card_type`、`card_name`、`card_no` 三项。响应字段为 `trans_status`、`account_no`、`resp_desc`。
 
 ## 用户查询 `gateway/user/query`
 
-请求：`way_code=APPLY`（SDK 自动带上）、`account_no`，可选 `client_ip`。
+请求：`way_code=APPLY`、`account_no`，可选 `client_ip`。
 这个接口只返回查询状态和查到的资料，不返回开户结果：`trans_status` 是查询状态（`S` 查询成功、`P` 处理中、`F` 查询失败）。
 查到的资料有 `account_no`、`account_name`、`account_type`、`relation_type`、`relation_type_name`、`division_profit`、`resp_desc`。`resp_desc` 可以为 `null`。
-`channel_status` 也在查询资料里：`0` 待入驻、`1` 成功、`2` 失败，可能是数字也可能是字符串。SDK 的 `isOnboarded()` / `is_onboarded()` / `IsOnboarded` 只表示该字段为 `1`，不能用来判断开户是否成功。
+`channel_status` 也在查询资料里：`0` 待入驻、`1` 成功、`2` 失败，可能是数字也可能是字符串。`channel_status == 1` 只表示渠道入驻状态，不能用来判断开户是否成功。
 `channel_extra` 可能是对象，也可能是 JSON 字符串。对象里有 `user_info`、`card_info`、`settle_config`、`cash_config`，以及同级 `settle_cycle`。
 查询结果的 `settle_config` 会多出 `min_amt`、`remained_amt`；`cash_config` 可能没有 `out_fee_flag`；`card_type` 可能是数字。这些字段只用于展示，不能原样提交到业务开通或业务变更。
 
