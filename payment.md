@@ -84,13 +84,25 @@ channel_extra={"pay_data_type":"code_img_url"}
 
 `pay_data_type=cashier` 时网关直接返回收银台 HTML 页面，不返回 JSON。服务端用 cURL / HTTP 客户端调用会拿到 HTML，按 JSON 解析必然失败（报“响应不是合法 JSON 对象”）。
 
-正确做法：
+正确做法：用户在商户页面点“去支付”后，商户服务端返回一个**自动提交**的表单，浏览器直接跳到立收通收银台，用户不需要再点任何按钮。
 
-1. 服务端照常组装统一下单参数，`channel_extra` 写 `{"pay_data_type":"cashier"}`，注入公共参数并签名，**不发请求**。
-2. 把签名后的全部字段输出成隐藏表单，`action` 为 `https://api.lspay.tech/gateway/unifiedorder`，`method="POST"`，由用户浏览器提交。收银台在用户浏览器里打开。
+1. 服务端照常组装统一下单参数，`channel_extra` 写 `{"pay_data_type":"cashier"}`，注入公共参数并签名，**服务端不发请求**。
+2. 把签名后的全部字段输出成隐藏表单，`action` 为 `https://api.lspay.tech/gateway/unifiedorder`，`method="POST"`，页面加载后立即用脚本 `submit()`，浏览器随即跳转到收银台。
 3. 支付结果仍以异步通知或订单查询为准。
 
+```html
+<form id="lspayCashierForm" method="POST" action="https://api.lspay.tech/gateway/unifiedorder">
+  <input type="hidden" name="mch_no" value="…">
+  <!-- 其余已签名字段，含 channel_extra 和 sign -->
+</form>
+<script>document.getElementById('lspayCashierForm').submit();</script>
+```
+
+前后端分离时，后端只返回 `action` 和已签名字段，前端拿到后立即创建同样的隐藏表单并 `submit()`，同样不需要用户再点一次。
+
 官方 SDK 已封装，见 [sdk.md](sdk.md) 的「cashier 收银台表单」；普通接口调用发 cashier 会直接报错。自建客户端时，把“签名”和“发送”拆成两个函数，表单与接口调用共用同一个签名函数。
+
+SDK 调试面板里需要再点一次“提交跳转收银台”，只是为了防止调试时误下单，正式接入不要照抄这个交互。
 
 签名后的字段里含 `sign`，但不含 `md5_key`，可以交给浏览器。不要把 `md5_key` 输出到页面。
 

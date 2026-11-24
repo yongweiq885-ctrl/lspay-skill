@@ -89,7 +89,7 @@ python scripts/lspay_sign.py verify --key "$LSPAY_MD5_KEY" --form "<通知原文
 - **公共参数**（每个请求都带）：`mch_no`、`app_id`、`req_time`（13 位毫秒时间戳）、`version=1.0`、`sign_type=MD5`、`sign`。`md5_key` 只用于签名，不放进请求体。
 - **签名**：去掉 `sign` 和空值 → 按键名 ASCII 升序 → `k=v&k=v`（不做 URL 编码）→ 末尾加 `&key={md5_key}` → MD5 → 大写。
 - **`channel_extra`** 是 JSON **字符串**：先序列化一次，同一个字符串既参与签名又放进表单。统一下单**必传**，没有业务字段时至少传 `{}`，一般写明 `pay_data_type`。
-- **`pay_data_type=cashier`**：网关返回收银台 HTML，不返回 JSON。服务端只签名、生成表单，由用户浏览器 POST 到网关，不能由服务端调用接口。见 [payment.md](payment.md) 的「cashier 收银台」。
+- **`pay_data_type=cashier`**：网关返回收银台 HTML，不返回 JSON，不能由服务端调用接口。服务端只签名，输出自动提交的表单，浏览器直接跳到立收通收银台，用户无需再点击。见 [payment.md](payment.md) 的「cashier 收银台」。
 - **金额**：下单、退款、分账、转账、余额支付都用**整数分**；提现金额和提现/结算查询结果用**元字符串**（如 `"99.99"`）。全程不用浮点数运算，元和分的换算用字符串或十进制库。
 - **单号**：`mch_order_no`、`mch_refund_no`、`order_id`、`order_no` 都由商户生成，唯一，最长 30 字符。
 - **响应判断**：`status == 200` 只表示接口调用成功，业务结果看 `data` 里的 `trans_status`、`order_state`、`state`。`data` 可能是对象，也可能是 JSON 字符串；开户、绑卡、余额查询等接口可能直接返回扁平业务字段。三种格式都要兼容。同步响应里的 `sign` 不需要验签。
@@ -166,7 +166,7 @@ python scripts/lspay_sign.py verify --key "$LSPAY_MD5_KEY" --form "<通知原文
 - [ ] 签名实现通过三组测试数据
 - [ ] md5_key 只在服务端，从环境变量/密钥管理读取，日志中不输出
 - [ ] 金额全程为整数分（提现除外），没有浮点运算
-- [ ] 统一下单都传了 channel_extra；用 cashier 时由浏览器提交签名表单，服务端没有直接调用接口
+- [ ] 统一下单都传了 channel_extra；用 cashier 时输出自动提交的签名表单直接跳转收银台，服务端没有直接调用接口
 - [ ] 单号唯一，有数据库唯一索引
 - [ ] 通知：全字段验签 + 核对商户号/金额/单号 + 幂等 + 事务提交后返回 "ok" + 已关闭 CSRF
 - [ ] 下单后有兜底：未收到通知时按订单查询补单（如定时任务查询“支付中”超过 N 分钟的订单）

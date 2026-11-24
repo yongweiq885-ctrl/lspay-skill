@@ -138,10 +138,10 @@ $req = (new UnifiedOrderRequest())
     ->setChannelExtra(['pay_data_type' => PayDataTypeEnum::CASHIER]);
 
 header('Content-Type: text/html; charset=utf-8');
-echo (new LsPayClient('default'))->renderCashierForm($req); // 输出自动提交的表单，浏览器跳到收银台
+echo (new LsPayClient('default'))->renderCashierForm($req); // 输出自动提交的表单，浏览器直接跳到收银台
 ```
 
-前后端分离时，后端返回 `buildCashierForm()` 的结果，前端用这些字段创建隐藏表单并提交。完整示例见 SDK 的 `php/LsPayDemo/v1/payment/create/CashierFormDemo.php`。
+`renderCashierForm()` / `toHtml()` / `to_html()` / `ToHtml()` / `HTML()` 输出的表单自带 `submit()` 脚本，作为“去支付”请求的响应返回给浏览器即可直接跳转，用户不需要再点击。前后端分离时，后端返回 `buildCashierForm()` 的结果，前端拿到后立即创建隐藏表单并 `submit()`。完整示例见 SDK 的 `php/LsPayDemo/v1/payment/create/CashierFormDemo.php`。
 
 ## PHP 调试面板
 
@@ -151,7 +151,7 @@ SDK 自带调试面板 `php/LsPayDemo/web/index.php`，覆盖全部接口，可�
 - 默认只允许本机访问。远程访问需设置 `LSPAY_DEBUG_PANEL_ALLOW_REMOTE=1`，建议同时设置 `LSPAY_DEBUG_PANEL_TOKEN`，访问时带 `?token=...`。
 - **干跑模式**默认开启：只在本地组装、校验和签名，不请求网关，响应区显示的是“模拟响应”。干跑**不能**验证商户号、应用 ID、密钥是否正确。
 - 发真实请求：在 `config.json` 里设置 `"debug_panel_allow_live": true`（或环境变量 `LSPAY_DEBUG_PANEL_ALLOW_LIVE=1`），刷新后取消勾选干跑；发送前会弹出确认框。验证凭证建议先用订单查询这类只读接口。
-- 统一下单选 `cashier` 时，面板生成签名表单，点“提交到收银台”在新标签页打开，不在服务端请求。
+- 统一下单选 `cashier` 时，面板生成签名表单，需要再点“提交跳转收银台”才在新标签页打开。多这一步只是为了防止调试时误下单；商户正式接入时直接输出自动提交的表单，见上一节。
 
 ## Go 示例
 

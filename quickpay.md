@@ -105,7 +105,7 @@ API 模式下所有接口的 `way_code` 都固定为 `BANK_FAST`。
 | 字段 | 必填 | 说明 |
 | --- | --- | --- |
 | `channel_user` | 否 | 用户 ID，由绑卡确认接口返回。传了才能在收银台里显示该用户已绑定的银行卡；不传则用户每次都要重新填卡 |
-| `pay_data_type` | 否 | `pay_url` 返回支付链接；`cashier` 时由浏览器提交签名表单到收银台，服务端不能直接调用，见 [payment.md](payment.md) 的「cashier 收银台」 |
+| `pay_data_type` | 否 | `pay_url` 返回支付链接；`cashier` 时输出自动提交的签名表单，浏览器直接跳到收银台，服务端不能直接调用，见 [payment.md](payment.md) 的「cashier 收银台」 |
 
 `channel_user` 只由绑卡确认接口 `gateway/quickpay/buckleconfirm` 返回；收银台支付的下单响应和支付通知里都没有这个字段。
 要让收银台带出已绑定的卡，先用绑卡申请 + 绑卡确认接口为用户绑卡，把返回的 `channel_user` 与本地用户关联保存，下单时带上；没有就不传。
